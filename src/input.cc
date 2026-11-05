@@ -90,16 +90,19 @@ void init_input(TennixArchive& tnxar)
     strcpy(devices[devices_count].name, "Mouse");
     devices_count++;
 
+#ifdef HAVE_SDL_NET
     /* network peer */
     devices[devices_count].type = INPUT_TYPE_NETWORK;
     devices[devices_count].icon = GR_INPUT_AI; /* FIXME - network icon! */
     strcpy(devices[devices_count].name, "Network player");
     devices_count++;
+#endif /* HAVE_SDL_NET */
 
     /* joysticks */
     n = SDL_NumJoysticks();
     for (x=0; x<n && devices_count<MAX_INPUT_DEVICES; x++) {
-        strcpy(devices[devices_count].name, SDL_JoystickNameForIndex(x));
+        const char* joyname = SDL_JoystickNameForIndex(x);
+        snprintf(devices[devices_count].name, sizeof(devices[devices_count].name), "%s", joyname ? joyname : "Joystick");
         devices[devices_count].type = INPUT_TYPE_JOYSTICK;
         devices[devices_count].joystick = SDL_JoystickOpen(x);
         devices[devices_count].x_axis = 0;
@@ -220,7 +223,12 @@ float input_device_get_axis(InputDevice* d, unsigned const char axis) {
             result = JOYSTICK_PERCENTIZE(SDL_JoystickGetAxis(d->joystick, 1+d->y_axis*2));
         }
     } else if (d->type == INPUT_TYPE_MOUSE) {
+#ifdef __amigaos__
+        /* Upstream never sets d->my, so the mouse player could not move. */
+        SDL_GetMouseState(&d->mx, &d->my);
+#else
         //mb = SDL_GetMouseState(&d->mx, &d->my);
+#endif
         if (axis == INPUT_AXIS_X) {
             /* Not x-movement yet (PLAYER_MOVE_X is not defined!) */
             /*if (std::abs(d->mx - d->player_x) > PLAYER_MOVE_X) {

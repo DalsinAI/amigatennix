@@ -129,9 +129,21 @@ void init_graphics(TennixArchive& tnxar) {
     buffer = SDL_CreateRGBSurface(0, WIDTH, HEIGHT, 32, 0, 0, 0, 0);
     background = SDL_CreateRGBSurface(0, WIDTH, HEIGHT, 32, 0, 0, 0, 0);
 
-    if( buffer == NULL) {
+    if( buffer == NULL || background == NULL) {
         fprintf( stderr, "Cannot create buffer surface: %s\n", SDL_GetError());
+#ifdef __amigaos__
+        tnx_amiga_message("Tennix", "Not enough memory for the 640x480 pictures.");
+#endif
+        exit(EXIT_FAILURE);
     }
+
+#ifdef __amigaos__
+    /* Something on the screen at once: the empty loading bar, before the
+     * fonts and the pictures (a while on a 68k). */
+    draw_button(40, (HEIGHT-40)/2, WIDTH-80, 40, 100, 100, 100, 1);
+    store_screen();
+    updatescr();
+#endif
 
     font_freelist = freelist_create();
 
@@ -166,12 +178,24 @@ void init_graphics(TennixArchive& tnxar) {
             exit(EXIT_FAILURE);
         }
         if( !tmp) {
-            fprintf( stderr, "Error: %s\n", SDL_GetError());
+            fprintf( stderr, "Error: %s (%s)\n", SDL_GetError(), graphics[i]);
+#ifdef __amigaos__
+            /* Never draw from a NULL surface: stand in a 1x1 clear one. */
+            images[i].data = SDL_CreateRGBSurfaceWithFormat(0, 1, 1, 32, SDL_PIXELFORMAT_ARGB8888);
+            tnx_assert(images[i].data != NULL);
+            SDL_FillRect(images[i].data, NULL, 0);
+#endif
             continue;
         }
 
+#ifdef __amigaos__
+        /* ARGB8888 onto the XRGB picture is SDL's fast alpha blit
+         * (BlitRGBtoRGBPixelAlpha); RGBA8888 takes the generic one. */
+        data = SDL_ConvertSurfaceFormat(tmp, SDL_PIXELFORMAT_ARGB8888, 0);
+#else
         /* Convert to RGBA in the display format */
         data = SDL_ConvertSurfaceFormat(tmp, SDL_PIXELFORMAT_RGBA8888, 0);
+#endif
         SDL_FreeSurface(tmp);
 
         if( !data) {
@@ -288,6 +312,9 @@ void show_image_rotozoom(image_id id, int x, int y, float rotate, float zoom)
     tnx_assert(id < GR_COUNT);
 
     tmp = rotozoomSurface(images[id].data, rotate, zoom, SMOOTHING_OFF);
+    if (tmp == NULL) {
+        return;
+    }
 
     dst.w = src.w = tmp->w;
     dst.h = src.h = tmp->h;
@@ -381,6 +408,9 @@ void rectangle_alpha(int x, int y, int w, int h, Uint8 r, Uint8 g, Uint8 b, Uint
     color = SDL_MapRGB(screen->format, r, g, b);
 
     buf = SDL_CreateRGBSurface(0, w, h, 32, 0, 0, 0, 0);
+    if (buf == NULL) {
+        return;
+    }
 
     rect.x = rect.y = 0;
     rect2.x = x;
@@ -519,8 +549,10 @@ void update_rect(Sint32 x, Sint32 y, Sint32 w, Sint32 h)
 
 void updatescr()
 {
+#ifndef __amigaos__
     // Update screen here, so that fullscreen toggle works
     screen = SDL_GetWindowSurface(window);
+#endif
 
     Uint32 ticks = SDL_GetTicks();
     SDL_Rect *r_current = NULL, *end_current = NULL;
@@ -534,6 +566,13 @@ void updatescr()
         SDL_SetSurfaceAlphaMod(buffer, 255-255*(ticks-fading_start)/FADE_DURATION);
         SDL_SetSurfaceBlendMode(buffer, SDL_BLENDMODE_BLEND);
         SDL_BlitSurface(buffer, NULL, screen, NULL);
+    }
+#ifdef __amigaos__
+    /* The whole 640x480 picture goes to the window's texture each frame
+     * (reset_screen() redraws all of it anyway). */
+    tnx_amiga_present();
+#else
+    if (fading_now) {
         SDL_UpdateWindowSurface(window);
     } else if (fading_last_time && !fading_now) {
         SDL_UpdateWindowSurface(window);
@@ -560,6 +599,7 @@ void updatescr()
             SDL_UpdateWindowSurfaceRects(window, rect_update_cache, rect_update_cache_current);
         }
     }
+#endif
 
     reset_screen();
     fading_last_time = fading_now;

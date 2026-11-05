@@ -1,0 +1,107 @@
+# Tennix for AmigaOS 3.x, 68040/68060 + FPU, on OpenGPU's SDL 2.
+#
+#   make -f amiga/Makefile.amigaos -j2 \
+#        STOVE=/path/to/openamigagcc-16.2.0-open4 \
+#        NDK=/path/to/OpenNDK/Include_H SDL2KIT=/path/to/opengpu-sdk
+#
+# STOVE is GFOpenAmigaGCC 16.2.0-open4 or later. SDL2KIT is the OpenGPU
+# developer kit: libSDL2.a, libSDL2_image.a and libSDL2_mixer.a (the
+# program's halves of LIBS:OpenGPU/SDL2.module, SDL2_image.module and
+# SDL2_mixer.module) and libSDL2_ttf.a (FreeType inside). SDL2_gfx's
+# rotozoomer is built from amiga/deps/SDL2_gfx-1.0.4. No SDL2_net (network
+# play off) and no Python (the Python bots are cut; the game's own
+# computer player stays).
+#
+# tennix.tnx is packed from upstream's data/ (GPL 2 or later, and public
+# domain photos and sounds: see AMIGA_PORT.md) by amiga/tools/tnxpack.py,
+# in the m68k struct layout. 'make ... dist' makes the drawer dist/Tennix
+# (+ dist/Tennix.info).
+
+STOVE   ?= $(HOME)/CradleLab/toolchain/openamigagcc-16.2.0-open4-x86_64-linux
+NDK     ?= $(HOME)/CradleLab/gfopensdk/OpenNDK/Include_H
+SDL2KIT ?= /mnt/amigachrome/team2/deps/opengpu-sdk
+PYTHON  ?= python3
+CC      = $(STOVE)/bin/m68k-amigaos-gcc
+CXX     = $(STOVE)/bin/m68k-amigaos-g++
+STRIP   = $(STOVE)/bin/m68k-amigaos-strip
+CPU     ?= -m68040 -m68881
+# -fno-tree-loop-distribute-patterns: GCC 16's loop miscompile (the kit's
+# sdl2-config gives it for GCC 16 too).
+OPT     ?= -O2 -fomit-frame-pointer -fno-tree-loop-distribute-patterns
+
+GFX     = amiga/deps/SDL2_gfx-1.0.4
+DEFS    = -D__amigaos__ -DNDEBUG
+INC     = -Iamiga -I$(GFX) -I$(SDL2KIT)/include/SDL2
+CFLAGS  = -noixemul $(OPT) $(CPU) -fno-common $(DEFS) $(INC)
+CXXFLAGS = $(CFLAGS) -include amiga/amiga_prelude.h -fno-exceptions -fno-rtti -Wall
+LDFLAGS = -noixemul $(CPU)
+LIBS    = -L$(SDL2KIT)/lib -lSDL2_ttf -lSDL2_image -lSDL2_mixer -lSDL2 -lm
+
+BUILD   = build/amigaos
+OBJDIR  = $(BUILD)/obj
+PROG    = Tennix
+OUT     = dist/Tennix
+
+# Upstream's TENNIX_OBJ without network.o and tennixpy.o.
+SRC     = src/tennix.cc src/game.cc src/graphics.cc src/input.cc \
+          src/util.cc src/sound.cc src/animation.cc src/archive.cc
+OBJS    = $(SRC:%.cc=$(OBJDIR)/%.o) \
+          $(OBJDIR)/amiga/amiga_tennix.o \
+          $(OBJDIR)/amiga/amiga_message.o $(OBJDIR)/amiga/amiga_screens.o \
+          $(OBJDIR)/amiga/amiga_pointer.o \
+          $(OBJDIR)/amiga/stack.o $(OBJDIR)/amiga/pthread_stubs.o \
+          $(OBJDIR)/gfx/SDL2_rotozoom.o
+
+# Upstream's TENNIX_TNX_DATA without HAVE_PYTHON's data/*.py.
+TNX_DATA = $(sort $(wildcard data/*.ogg) $(wildcard data/*.ttf) $(wildcard data/*.png))
+
+ICONS   = $(wildcard amiga/icons/*.info)
+HDRS    = $(wildcard src/*.h) amiga/config.h amiga/amiga_prelude.h
+
+all: $(BUILD)/$(PROG) $(BUILD)/tennix.tnx
+
+$(BUILD)/$(PROG): $(OBJS)
+	$(CXX) $(LDFLAGS) -o $@.debug $(OBJS) $(LIBS)
+	$(STRIP) -o $@ $@.debug
+
+$(OBJDIR)/src/%.o: src/%.cc $(HDRS)
+	@mkdir -p $(dir $@)
+	$(CXX) $(CXXFLAGS) -c -o $@ $<
+
+$(OBJDIR)/amiga/amiga_tennix.o: amiga/amiga_tennix.cc $(HDRS)
+	@mkdir -p $(dir $@)
+	$(CXX) $(CXXFLAGS) -Isrc -c -o $@ $<
+
+$(OBJDIR)/amiga/%.o: amiga/%.c
+	@mkdir -p $(dir $@)
+	$(CC) $(CFLAGS) -I$(NDK) -Wall -Wextra -c -o $@ $<
+
+$(OBJDIR)/gfx/%.o: $(GFX)/%.c $(GFX)/SDL2_rotozoom.h
+	@mkdir -p $(dir $@)
+	$(CC) $(CFLAGS) -c -o $@ $<
+
+$(BUILD)/tennix.tnx: amiga/tools/tnxpack.py $(TNX_DATA)
+	@mkdir -p $(dir $@)
+	$(PYTHON) amiga/tools/tnxpack.py $@ $(TNX_DATA)
+
+dist: $(BUILD)/$(PROG) $(BUILD)/tennix.tnx $(ICONS) AMIGA_PORT.md README.md COPYING data/COPYING
+	rm -rf $(OUT) && mkdir -p $(OUT)
+	cp $(BUILD)/$(PROG) $(BUILD)/tennix.tnx $(OUT)/
+	cp AMIGA_PORT.md $(OUT)/ReadMe
+	cp README $(OUT)/README-tennix
+	cp COPYING $(OUT)/COPYING.txt
+	cp data/COPYING $(OUT)/COPYING-data.txt
+	cp $(GFX)/LICENCE.txt $(OUT)/COPYING-SDL2_gfx.txt
+	cp amiga/icons/Tennix.info amiga/icons/ReadMe.info $(OUT)/
+	cp amiga/icons/ReadMe.info $(OUT)/README-tennix.info
+	cp amiga/icons/ReadMe.info $(OUT)/COPYING.txt.info
+	cp amiga/icons/ReadMe.info $(OUT)/COPYING-data.txt.info
+	cp amiga/icons/ReadMe.info $(OUT)/COPYING-SDL2_gfx.txt.info
+	cp amiga/icons/Tennix-drawer.info dist/Tennix.info
+
+objs: $(OBJS)
+
+clean:
+	rm -rf $(BUILD) $(OUT) dist/Tennix.info
+
+.PHONY: all dist objs clean

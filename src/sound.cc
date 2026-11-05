@@ -114,7 +114,12 @@ void init_sound(TennixArchive& tnxar) {
     char *d;
     Mix_Chunk* data;
 
+#ifdef __amigaos__
+    /* Half the PC's rate: less mixing for the 68k. */
+    if( Mix_OpenAudio( 22050, AUDIO_S16SYS, 2, 1024) < 0) {
+#else
     if( Mix_OpenAudio( 44100, AUDIO_S16SYS, 2, 1024) < 0) {
+#endif
         fprintf( stderr, "Error initializing SDL_mixer: %s\n", Mix_GetError());
     }
 

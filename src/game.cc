@@ -391,8 +391,14 @@ void step(GameState* s) {
 bool handle_input(GameState* s, TennixNet* c) {
     const Uint8* keys = NULL;
     int p;
+#ifdef __amigaos__
+    bool window_closed;
+#endif
 
     SDL_PumpEvents();
+#ifdef __amigaos__
+    window_closed = tnx_amiga_drain_events();
+#endif
     keys = SDL_GetKeyboardState(NULL);
 
 #ifdef HAVE_SDL_NET
@@ -435,8 +441,15 @@ bool handle_input(GameState* s, TennixNet* c) {
         }
     }
     
+#ifdef __amigaos__
+    bool leave = (keys[SDL_SCANCODE_ESCAPE] || keys[SDL_SCANCODE_Q] || window_closed);
+    /* Every press latched since the last tick has been seen now. */
+    tnx_amiga_input_tick_done();
+    return leave;
+#else
     /* Maemo: The "F4" button is the "Open menu" button */
     return (keys[SDL_SCANCODE_ESCAPE] || keys[SDL_SCANCODE_Q]);
+#endif
 }
 
 void render(const GameState* s, RenderState* r) {
