@@ -1,0 +1,8 @@
+/.tennix-current_match-*
+*.o
+/config.h
+/config.mk
+/dependencies.mk
+/tennix
+/tennix.tnx
+/tnxar

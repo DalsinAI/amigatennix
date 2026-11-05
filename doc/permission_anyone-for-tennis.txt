@@ -1,0 +1,89 @@
+Return-path: <Mthird3rd@aol.com>
+Envelope-to: thp@thpinfo.com
+Delivery-date: Mon, 09 Feb 2009 18:43:55 +0100
+Received: from imo-m11.mx.aol.com ([64.12.143.99] helo=imo-m11.mail.aol.com)
+	by khan.thpinfo.com with esmtp (Exim 4.63)
+	(envelope-from <Mthird3rd@aol.com>)
+	id 1LWaAj-00026F-2m
+	for thp@thpinfo.com; Mon, 09 Feb 2009 18:43:54 +0100
+Received: from Mthird3rd@aol.com
+	by imo-m11.mx.aol.com  (mail_out_v39.1.) id i.d07.4b7e1523 (65100)
+	 for <thp@thpinfo.com>; Mon, 9 Feb 2009 12:33:00 -0500 (EST)
+From: Mthird3rd@aol.com
+Message-ID: <d07.4b7e1523.36c1c2cc@aol.com>
+Date: Mon, 9 Feb 2009 12:33:00 EST
+To: thp@thpinfo.com
+MIME-Version: 1.0
+Content-Type: multipart/alternative; boundary="-----------------------------1234200780"
+X-Mailer: 9.0 SE for Windows sub 5045
+X-SA-Exim-Connect-IP: 64.12.143.99
+X-SA-Exim-Mail-From: Mthird3rd@aol.com
+X-Spam-Checker-Version: SpamAssassin 3.2.3 (2007-08-08) on khan.thpinfo.com
+X-Spam-Level: 
+X-Spam-Status: No, score=0.7 required=4.0 tests=BAYES_20,HTML_MESSAGE,
+	MIME_QP_LONG_LINE,SPF_PASS autolearn=no version=3.2.3
+Subject: Re: Usage of "Anyone for Tennis?" photo on Flickr
+X-SA-Exim-Version: 4.2.1 (built Tue, 09 Jan 2007 17:51:29 +0000)
+X-SA-Exim-Scanned: Yes (on khan.thpinfo.com)
+Content-Length: 1848
+
+
+-------------------------------1234200780
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+
+Hi Thomas, good to hear from you.
+ 
+Thanks for your interest in using my "Anyone for Tennis?" photo on  Flickr.
+ 
+I'm happy to allow you to use the image for your Tennix game, but  I'd rather 
+keep the "All rights reserved" copyright, if this is  acceptable.  Also, is 
+it possible to provide a credit for the photo, or a  link to it in Flickr?
+ 
+Thanks for asking first!!!
+ 
+Best Regards
+ 
+Martin Third
+Edinburgh, Scotland
+ 
+ 
+ 
+
+-------------------------------1234200780
+Content-Type: text/html; charset="US-ASCII"
+Content-Transfer-Encoding: quoted-printable
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML><HEAD>
+<META http-equiv=3DContent-Type content=3D"text/html; charset=3DUS-ASCII">
+<META content=3D"MSHTML 6.00.6000.16788" name=3DGENERATOR></HEAD>
+<BODY id=3Drole_body style=3D"FONT-SIZE: 10pt; COLOR: #000000; FONT-FAMILY:=20=
+Arial"=20
+bottomMargin=3D7 leftMargin=3D7 topMargin=3D7 rightMargin=3D7><FONT id=3Drol=
+e_document=20
+face=3DArial color=3D#000000 size=3D2>
+<DIV>Hi Thomas, good to hear from you.</DIV>
+<DIV>&nbsp;</DIV>
+<DIV>Thanks for your interest in using my "Anyone for Tennis?" photo on=20
+Flickr.</DIV>
+<DIV>&nbsp;</DIV>
+<DIV>I'm happy to allow you to use&nbsp;the image&nbsp;for your Tennix game,=
+ but=20
+I'd rather keep the "All rights reserved" copyright, if this is=20
+acceptable.&nbsp; Also, is it possible to provide a credit for the photo, or=
+ a=20
+link to it in Flickr?</DIV>
+<DIV>&nbsp;</DIV>
+<DIV>Thanks for asking first!!!</DIV>
+<DIV>&nbsp;</DIV>
+<DIV>Best Regards</DIV>
+<DIV>&nbsp;</DIV>
+<DIV>Martin Third</DIV>
+<DIV>Edinburgh, Scotland</DIV>
+<DIV>&nbsp;</DIV>
+<DIV>&nbsp;</DIV>
+<DIV>&nbsp;</DIV></FONT></BODY></HTML>
+
+-------------------------------1234200780--
+
