@@ -50,6 +50,12 @@ struct _TennixArchiveItem {
 
 typedef struct _TennixArchiveItem TennixArchiveItem;
 
+#ifdef __amigaos__
+/* m68k aligns uint32_t on 2 bytes: the item is 96 bytes here, 100 on a PC.
+ * amiga/tools/tnxpack.py writes this layout. */
+static_assert(sizeof(TennixArchiveItem) == 96, "Amiga tennix.tnx item layout");
+#endif
+
 std::ostream&
 operator<<(std::ostream& out, TennixArchiveItem& item);
 
@@ -62,6 +68,10 @@ struct _TennixArchiveHeader {
 };
 
 typedef struct _TennixArchiveHeader TennixArchiveHeader;
+
+#ifdef __amigaos__
+static_assert(sizeof(TennixArchiveHeader) == 34, "Amiga tennix.tnx header layout");
+#endif
 
 std::ostream&
 operator<<(std::ostream& out, TennixArchiveHeader& header);

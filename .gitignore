@@ -6,3 +6,8 @@
 /tennix
 /tennix.tnx
 /tnxar
+
+# Amiga port build
+/build/
+# Amiga port: the game drawer made by amiga/Makefile.amigaos dist
+/dist/

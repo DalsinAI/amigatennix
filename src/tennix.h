@@ -37,6 +37,25 @@
 
 #include <SDL.h>
 
+#ifdef __amigaos__
+/* amiga/amiga_tennix.cc: the window's picture, keys and mouse through
+ * events, the requester and the leftover SDL screens. */
+void tnx_amiga_message(const char* title, const char* text);
+void tnx_amiga_init(void);
+SDL_Surface* tnx_amiga_video_init(SDL_Window* window);
+void tnx_amiga_present(void);
+void tnx_amiga_input_init(void);
+const Uint8* tnx_amiga_keyboard_state(int* numkeys);
+Uint32 tnx_amiga_mouse_state(int* x, int* y);
+void tnx_amiga_input_tick_done(void);
+bool tnx_amiga_drain_events(void);
+bool tnx_amiga_quit_seen(void);
+/* OpenGPU's SDL2.module: keys and the mouse are read from the events
+ * (an event watch keeps their state), not from SDL's own state tables. */
+#define SDL_GetKeyboardState(n) tnx_amiga_keyboard_state(n)
+#define SDL_GetMouseState(x, y) tnx_amiga_mouse_state(x, y)
+#endif
+
 #ifdef HAVE_SDL_NET
 #include <SDL_net.h>
 #endif
@@ -72,10 +91,17 @@ typedef struct {
 typedef void TennixNet;
 #endif /* HAVE_SDL_NET */
 
+#ifdef __amigaos__
+/* The data and the paused match live in the program's drawer. */
+#define ARCHIVE_FILE "PROGDIR:tennix.tnx"
+#define ARCHIVE_FILE_INSTALLED "tennix.tnx"
+#define GAMESTATE_FILE "PROGDIR:tennix-match-" VERSION
+#else
 #define ARCHIVE_FILE "tennix.tnx"
 #define ARCHIVE_FILE_INSTALLED "/" PREFIX "/share/tennix/" ARCHIVE_FILE
 
 #define GAMESTATE_FILE ".tennix-current_match-" VERSION
+#endif
 
 #define COPYRIGHT "Copyright 2003, 2007-2011, 2013, 2017, 2019-2020, 2023 Thomas Perl"
 #define URL "http://icculus.org/tennix/"

@@ -1,0 +1,9 @@
+SDL2_rotozoom.c, SDL2_rotozoom.h, COPYING and README from SDL2_gfx 1.0.4
+(Andreas Schiffler, zlib licence: LICENCE.txt is the notice from
+SDL2_rotozoom.c), unchanged, taken from Debian's
+libsdl2-gfx_1.0.4+dfsg.orig.tar.gz
+(https://deb.debian.org/debian/pool/main/libs/libsdl2-gfx/,
+sha256 af55b6515d6850779a9d69a4775d3c8cc5859872d4e8f31935ea5bfe6b10b7b2).
+Upstream: https://www.ferzkopp.net/Software/SDL2_gfx/Docs/html/
+Tennix uses only rotozoomSurface() (the ball, its shadow, the menu
+buttons, the controller pictures).

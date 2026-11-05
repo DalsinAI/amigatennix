@@ -189,7 +189,12 @@ int main( int argc, char** argv) {
         srand((unsigned)time(NULL));
     }
 
+#ifdef __amigaos__
+    tnx_amiga_init();
+    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK | SDL_INIT_AUDIO) == -1) {
+#else
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK) == -1) {
+#endif
         fprintf( stderr, "Can't init SDL:  %s\n", SDL_GetError());
         exit( 1);
     }
@@ -199,8 +204,14 @@ int main( int argc, char** argv) {
             WIDTH, HEIGHT,
             sdl_flags);
 
+#ifdef __amigaos__
+    /* The game's own 32-bit picture, shown through the window's renderer. */
+    screen = tnx_amiga_video_init(window);
+    tnx_amiga_input_init();
+#else
     // Obtain the initial window surface
     screen = SDL_GetWindowSurface(window);
+#endif
 
     SDL_ShowCursor( SDL_DISABLE);
 
@@ -521,6 +532,29 @@ int main( int argc, char** argv) {
             draw_button_object(&btn_back, mx, my);
         }
 
+#ifdef __amigaos__
+        /* Every event of the frame (upstream took one a frame), and the
+         * keys as presses: an Escape still held from the match does not
+         * quit the menu it returns to. */
+        bool leave_now = false;
+        while (SDL_PollEvent(&e)) {
+            if (e.type == SDL_QUIT) {
+                state = MENU_STATE_SLIDE_TO_QUIT;
+            } else if (e.type == SDL_KEYDOWN && !e.key.repeat &&
+                    (e.key.keysym.scancode == SDL_SCANCODE_ESCAPE ||
+                     e.key.keysym.scancode == SDL_SCANCODE_Q)) {
+                leave_now = true;
+            }
+        }
+        if (tnx_amiga_quit_seen() && state != MENU_STATE_SLIDE_TO_QUIT_IN_PROGRESS
+                && state != MENU_STATE_QUIT) {
+            /* The window was closed during a match. */
+            state = MENU_STATE_SLIDE_TO_QUIT;
+        }
+        (void)keys;
+        mb = SDL_GetMouseState( &mx, &my);
+        tnx_amiga_input_tick_done();
+#else
         SDL_PollEvent( &e);
         if( e.type == SDL_QUIT) {
             state = MENU_STATE_SLIDE_TO_QUIT;
@@ -529,6 +563,7 @@ int main( int argc, char** argv) {
 
         keys = SDL_GetKeyboardState(NULL);
         mb = SDL_GetMouseState( &mx, &my);
+#endif
 
         btn_hovering_old = btn_hovering;
         if (state == MENU_STATE_MAINMENU) {
@@ -574,6 +609,13 @@ int main( int argc, char** argv) {
 #endif
         }
    
+#ifdef __amigaos__
+        if (leave_now) {
+            break;
+        }
+        /* No V (fullscreen toggle): SDL2.module 0.6 leaves screens behind
+         * when a window leaves full screen. Start with -f instead. */
+#else
         if( keys[SDL_SCANCODE_ESCAPE] || keys[SDL_SCANCODE_Q]) {
             /* FIXME: do the state thingie! */
             break;
@@ -586,6 +628,7 @@ int main( int argc, char** argv) {
                 SDL_SetWindowSize(window, WIDTH, HEIGHT);
             }
         }
+#endif
    
         if (state == MENU_STATE_MAINMENU || state == MENU_STATE_OPTIONS || state == MENU_STATE_LOCATION) {
             show_image(GR_CURSOR, mx-2, my-1, 255);
@@ -675,8 +718,12 @@ int main( int argc, char** argv) {
                             PLAYER(prepared_game, 1).input_device_index = -1;
                         }
 
-                        if (input_devices[PLAYER(prepared_game, 1).input_device_index].exclusive_to_player == 2) {
+                        if (PLAYER(prepared_game, 1).input_device_index >= 0 &&
+                                input_devices[PLAYER(prepared_game, 1).input_device_index].exclusive_to_player == 2) {
                             PLAYER(prepared_game, 1).input_device_index++;
+                            if (PLAYER(prepared_game, 1).input_device_index == (signed int)input_device_count) {
+                                PLAYER(prepared_game, 1).input_device_index = -1;
+                            }
                         }
 
                         /* determine the selected input device */
@@ -694,7 +741,8 @@ int main( int argc, char** argv) {
                         /* advance the input device index */
                         PLAYER(prepared_game, 2).input_device_index++;
 
-                        if (input_devices[PLAYER(prepared_game, 2).input_device_index].exclusive_to_player == 1) {
+                        if (PLAYER(prepared_game, 2).input_device_index < (signed int)input_device_count &&
+                                input_devices[PLAYER(prepared_game, 2).input_device_index].exclusive_to_player == 1) {
                             PLAYER(prepared_game, 2).input_device_index++;
                         }
 

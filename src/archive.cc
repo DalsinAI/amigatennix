@@ -34,7 +34,13 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
+#ifdef __amigaos__
+/* No arpa/inet.h in libnix; the 68k is big-endian (network order). */
+#define ntohl(x) SDL_SwapBE32(x)
+#define htonl(x) SDL_SwapBE32(x)
+#else
 #include <arpa/inet.h>
+#endif
 
 #include "archive.h"
 
@@ -74,6 +80,10 @@ TennixArchive::TennixArchive(const char* filename, const char* fallback)
 
     if (fp == NULL) {
         fprintf(stderr, "Cannot open archive: %s\n", filename);
+#ifdef __amigaos__
+        tnx_amiga_message("Tennix", "Cannot open the game data, tennix.tnx.\n"
+                "It belongs in the Tennix drawer, beside the program.");
+#endif
         exit(1);
     }
 
@@ -141,6 +151,7 @@ TennixArchive::getItemBytes()
 {
     size_t size = getItemSize();
     char* data = (char*)malloc(size+1);
+    tnx_assert(data != NULL);
     /* the last char is a null character, so this works for strings, too */
     data[size]='\0';
     fseek(fp, items[current_item].offset, SEEK_SET);
