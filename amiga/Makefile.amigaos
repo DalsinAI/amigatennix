@@ -48,6 +48,7 @@ SRC     = src/tennix.cc src/game.cc src/graphics.cc src/input.cc \
 OBJS    = $(SRC:%.cc=$(OBJDIR)/%.o) \
           $(OBJDIR)/amiga/amiga_tennix.o \
           $(OBJDIR)/amiga/amiga_message.o $(OBJDIR)/amiga/amiga_screens.o \
+          $(OBJDIR)/amiga/amiga_pointer.o \
           $(OBJDIR)/amiga/stack.o $(OBJDIR)/amiga/pthread_stubs.o \
           $(OBJDIR)/gfx/SDL2_rotozoom.o
 

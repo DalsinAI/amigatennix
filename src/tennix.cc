@@ -113,6 +113,10 @@ int main( int argc, char** argv) {
     bool do_help = false;
 
     int state = MENU_STATE_STARTED;
+#ifdef __amigaos__
+    bool leave_now = false;
+    Uint32 quit_ticks;
+#endif
 
 #ifdef ENABLE_FPS_LIMIT
     Uint32 ft, frames; /* frame timer and frames */
@@ -536,7 +540,7 @@ int main( int argc, char** argv) {
         /* Every event of the frame (upstream took one a frame), and the
          * keys as presses: an Escape still held from the match does not
          * quit the menu it returns to. */
-        bool leave_now = false;
+        leave_now = false;
         while (SDL_PollEvent(&e)) {
             if (e.type == SDL_QUIT) {
                 state = MENU_STATE_SLIDE_TO_QUIT;
@@ -780,12 +784,24 @@ int main( int argc, char** argv) {
         }
     }
 
+#ifdef __amigaos__
+    /* Esc or Q in the menu leaves at once: the credits (about 14 s) only
+     * roll after the Quit button or the window's close gadget, and a key
+     * or a click skips them. stderr says where the time goes. */
+    quit_ticks = SDL_GetTicks();
+    if (!leave_now) {
+#endif
     /* Play the credits */
     intro = create_credits();
     intro_playback = animation_state_new(intro);
     animation_state_run(intro_playback, 1);
     animation_state_free(intro_playback);
     animation_free(intro);
+#ifdef __amigaos__
+    }
+    fprintf(stderr, "Quit: credits %lu ms\n", (unsigned long)(SDL_GetTicks() - quit_ticks));
+    quit_ticks = SDL_GetTicks();
+#endif
 
     uninit_graphics();
     uninit_input();
@@ -793,6 +809,9 @@ int main( int argc, char** argv) {
     uninit_network();
 #endif /* HAVE_SDL_NET */
 
+#ifdef __amigaos__
+    fprintf(stderr, "Quit: freeing %lu ms\n", (unsigned long)(SDL_GetTicks() - quit_ticks));
+#endif
     SDL_Quit();
     return 0;
 }

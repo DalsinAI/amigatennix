@@ -13,7 +13,9 @@ imported unchanged as commit bb58e632c675b224cb08c79521bb74929d830496
 (tag v1.3.4). Upstream's git (https://repo.or.cz/tennix.git) could not be
 reached from here; https://github.com/thp/tennix does not exist.
 
-Status: builds and links; not yet run on an Amiga.
+Status: plays in the lab (Instance-45, windowed 640x480): menu, world
+map, controller setup, a match against the computer, Esc and Resume.
+The pointer fix and the quicker quit below are built, not yet re-tested.
 
 
 What you need
@@ -52,8 +54,9 @@ Keys in a match (upstream's presets):
   middle topspin, right smash.
 - Joystick: stick up/down, buttons 1, 2, 3.
 - Esc or Q: back to the menu, match paused (Resume). Esc or Q in the menu
-  quits (the paused match is kept in PROGDIR:tennix-match-1.3.4); any key
-  skips the credits.
+  quits at once (the paused match is kept in PROGDIR:tennix-match-1.3.4);
+  the Quit button and the close gadget roll the credits first (about
+  14 s; a key or a click skips them).
 
 
 Building
@@ -110,6 +113,16 @@ What was changed
     it, so a short tap of Space is not lost (src/tennix.h maps the two
     calls onto it). The match drains the event queue each tick (upstream
     only pumped it); closing the window during a match quits.
+  - Pointer (amiga/amiga_pointer.c): in the lab the module's mouse
+    events were about 16 px right and 32 px down of the real pointer (the
+    window borders). The game reads the pointer from its Intuition window
+    instead (MouseX/MouseY less BorderLeft/BorderTop, scaled from the
+    inner size to 640x480); its window is the active one with the game's
+    title, or the active one on SDL's own screen (-f). Elsewhere SDL's
+    numbers stay.
+  - Quit: the ~10 s of black window after Esc in the menu was upstream's
+    credits roll (about 14 s). Esc/Q now leave at once; stderr prints
+    "Quit: credits .. ms" and "Quit: freeing .. ms".
   - An Intuition requester when tennix.tnx is missing or the window cannot
     be opened (amiga/amiga_message.c), and the empty "SDL" screens
     SDL2.module 0.6 leaves after a full screen are closed at exit
@@ -167,9 +180,8 @@ Licences
 Known limits / to check in the lab
 ----------------------------------
 
-- Not run yet. First: the loading bar, the title (sidebar sliding in, the
-  menu), the world map, a match against Carl Van Court with Keyboard
-  (arrows): Space held fills the power bar, Esc back to the menu, Resume.
+- Re-test: the game's cursor on the real pointer, windowed and with -f;
+  Esc in the menu quits at once; the Quit button shows the credits.
 - Speed: the whole 640x480 picture goes to the texture every frame; the
   game's physics are tick-based, so a slow frame rate only makes it jerky.
 - Sound: Ogg decoding through SDL2_mixer.module at load time; the audience

@@ -98,7 +98,11 @@ void animation_state_run(AnimationState* state, int interruptible)
     while (animation_state_update(state)) {
         if (interruptible) {
             while (SDL_PollEvent(&e)) {
-                if (e.type == SDL_KEYDOWN || e.type == SDL_QUIT) {
+                if (e.type == SDL_KEYDOWN || e.type == SDL_QUIT
+#ifdef __amigaos__
+                        || e.type == SDL_MOUSEBUTTONDOWN
+#endif
+                        ) {
                     return;
                 }
             }

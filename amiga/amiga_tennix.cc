@@ -24,6 +24,22 @@ extern "C" {
 void amiga_message(const char* title, const char* text);
 void amiga_screens_snapshot(void);
 void amiga_screens_close_leftovers(void);
+int amiga_pointer_get(const char* title, int log_w, int log_h, int* x, int* y);
+}
+
+static int mouse_x = WIDTH / 2, mouse_y = HEIGHT / 2;
+
+#define WINDOW_TITLE "Tennix Classic Championship Tour 2011"
+
+/* The pointer from Intuition (amiga/amiga_pointer.c): the module's own
+ * mouse coordinates are off by the window borders. */
+static void pointer_from_intuition(void)
+{
+    int x, y;
+    if (amiga_pointer_get(WINDOW_TITLE, WIDTH, HEIGHT, &x, &y)) {
+        mouse_x = x;
+        mouse_y = y;
+    }
 }
 
 static SDL_Renderer* renderer;
@@ -33,7 +49,6 @@ static SDL_Surface* frame;
 static Uint8 key_down[SDL_NUM_SCANCODES];
 static Uint8 key_latch[SDL_NUM_SCANCODES];
 static Uint8 key_view[SDL_NUM_SCANCODES];
-static int mouse_x = WIDTH / 2, mouse_y = HEIGHT / 2;
 static Uint32 mouse_down, mouse_latch;
 
 void tnx_amiga_message(const char* title, const char* text)
@@ -126,16 +141,19 @@ static int SDLCALL input_watch(void* userdata, SDL_Event* e)
         case SDL_MOUSEMOTION:
             mouse_x = e->motion.x;
             mouse_y = e->motion.y;
+            pointer_from_intuition();
             break;
         case SDL_MOUSEBUTTONDOWN:
             mouse_x = e->button.x;
             mouse_y = e->button.y;
+            pointer_from_intuition();
             mouse_down |= SDL_BUTTON(e->button.button);
             mouse_latch |= SDL_BUTTON(e->button.button);
             break;
         case SDL_MOUSEBUTTONUP:
             mouse_x = e->button.x;
             mouse_y = e->button.y;
+            pointer_from_intuition();
             mouse_down &= ~SDL_BUTTON(e->button.button);
             break;
         case SDL_WINDOWEVENT:
@@ -170,6 +188,7 @@ const Uint8* tnx_amiga_keyboard_state(int* numkeys)
 
 Uint32 tnx_amiga_mouse_state(int* x, int* y)
 {
+    pointer_from_intuition();
     if (x != NULL) {
         *x = mouse_x;
     }
