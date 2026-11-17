@@ -98,6 +98,7 @@ dist: $(BUILD)/$(PROG) $(BUILD)/tennix.tnx $(ICONS) AMIGA_PORT.md README.md COPY
 	cp amiga/icons/ReadMe.info $(OUT)/COPYING-data.txt.info
 	cp amiga/icons/ReadMe.info $(OUT)/COPYING-SDL2_gfx.txt.info
 	cp amiga/icons/Tennix-drawer.info dist/Tennix.info
+	cp package/Install-Tennix package/Install-Tennix.info dist/
 
 objs: $(OBJS)
 

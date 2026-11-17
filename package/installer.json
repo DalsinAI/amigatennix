@@ -1,0 +1,21 @@
+{
+  "name": "Tennix!",
+  "version": "1.3.4-amigaos3",
+  "drawer": "Tennix",
+  "program": "Tennix",
+  "cpu": "68040",
+  "fpu": true,
+  "space": 5000000,
+  "modules": [
+    "SDL2.module",
+    "SDL2_image.module",
+    "SDL2_mixer.module"
+  ],
+  "keep": [
+    "tennix-match-1.3.4",
+    "Screenshots"
+  ],
+  "parent": "Work:Games",
+  "badge": "../amiga/icons/art/tennix.png",
+  "script": "Install-Tennix"
+}
