@@ -28,6 +28,19 @@ What you need
 - About 3.2 MB of disk, about 16 MB of memory.
 
 
+Installing
+----------
+
+The archive holds the Tennix drawer and Install-Tennix. Unpack it
+anywhere and double-click Install-Tennix: it checks the CPU, the FPU and
+the GFOpenGPU modules, asks where the game goes (Work:Games by default)
+and copies the drawer there. Installing again over it keeps your
+tennix-match-1.3.4 and Screenshots. package/installer.json is its spec
+(DalsinAI/amicradle's scripts/ports/port_installer.py writes the script
+and its icon), and package/build-amiga.sh builds the drawer and packs
+the archive.
+
+
 How to play
 -----------
 

@@ -11,3 +11,5 @@
 /build/
 # Amiga port: the game drawer made by amiga/Makefile.amigaos dist
 /dist/
+/build-amiga-package/
+__pycache__/
